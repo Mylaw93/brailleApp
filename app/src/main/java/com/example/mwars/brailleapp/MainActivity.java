@@ -28,6 +28,8 @@ public class MainActivity extends Activity{
     public TextView txt1;
     public Map<Integer, String> keyMap = new HashMap<Integer, String>();
     public StringBuilder sbKey = new StringBuilder();
+    public StringBuilder sbMessage = new StringBuilder();
+    public Boolean messageFlag = false;
 
 
 
@@ -70,6 +72,7 @@ public class MainActivity extends Activity{
         keyMap.put(1, "a");
         keyMap.put(2, ",");
         keyMap.put(3, ".");
+        keyMap.put(4, " ");
         keyMap.put(12, "b");
         keyMap.put(13, "k");
         keyMap.put(14, "c");
@@ -120,6 +123,7 @@ public class MainActivity extends Activity{
         keyMap.put(12345, "q");
         keyMap.put(12346, "ż");
         keyMap.put(13456, "y");
+        keyMap.put(123456, "msg");
 
     }
 
@@ -146,7 +150,7 @@ public class MainActivity extends Activity{
         new CountDownTimer(1350,10){
             @Override
             public void onTick(long l) {
-                txt1.setText("SEC:" + l);
+//                txt1.setText("SEC:" + l);
             }
 
             @Override
@@ -154,18 +158,30 @@ public class MainActivity extends Activity{
                 char [] c = sbKey.toString().toCharArray();
                 Arrays.sort(c);
                 String temp = new String(c);
-                Log.d("SB KEY ", sbKey.toString());
+                String sign;
+//                Log.d("SB KEY ", sbKey.toString());
 //                Log.d("KEYMAP ", Boolean.toString(keyMap.containsKey(Integer.parseInt(sbKey.toString()))));
                 try {
-                    addSign(temp);
-                    speech(temp);
-                    clear();
+                    sign = keyMap.get(Integer.parseInt(temp)).toString();
+
+                    if(keyMap.get(Integer.parseInt(temp)).toString().contains("msg")){
+                        messageFlag = true;
+                        txt1.setText(sbMessage);
+                        speech(sbMessage.toString());
+                        return;
+                    }
+
+                    txt1.setText(sign);
+                    addSign(sign);
+                    speech(sign);
                 }
                 catch (Exception e)
                 {
-                    Log.d("EXCEPTION ", e.toString());
-                    clear();
+//                    Log.d("EXCEPTION ", e.toString());
                     return;
+                }
+                finally {
+                    clear();
                 }
 
 //                if(keyMap.containsKey(Integer.parseInt(sbKey.toString())) == false){
@@ -183,7 +199,10 @@ public class MainActivity extends Activity{
 
 
     public void speech(String sign){
-        final String tempSign = keyMap.get(Integer.parseInt(sign)).toString();
+//        final String tempSign = keyMap.get(Integer.parseInt(sign)).toString();
+        final String tempSign = sign;
+        if(messageFlag) messageFlag = false;
+
         tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -197,8 +216,9 @@ public class MainActivity extends Activity{
     }
 
 
-    public void addSign(String signKey){
-        Log.d(TAG, signKey);
+    public void addSign(String sign){
+        sbMessage.append(sign);
+        Log.d(TAG, sbMessage.toString());
         return;
     }
 
@@ -212,7 +232,7 @@ public class MainActivity extends Activity{
         rbttn5.setChecked(false);
         rbttn6.setChecked(false);
         sbKey.setLength(0);
-        txt1.setText("");
+//        txt1.setText("");
     }
 
 
